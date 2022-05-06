@@ -24,7 +24,8 @@ class NSLS2Calendar():
     icol = 0
     calendar = []
     firstofmonth = None
-
+    icsfile = ''
+    
 
     def set_workbook(self, xlsx):
         self.wb = load_workbook(filename = xlsx)
@@ -49,7 +50,7 @@ class NSLS2Calendar():
 
         The for loop goes out to 200.  This is a crude solution.
 
-        A full year goes out to ~FX ~= 7*26 = 182, so 200 is enough columns
+        A full year goes out to ~FX ~= 7*26 = 182, so 200 should be enough columns
 
         It's a bit hard to reliably find the right-most edge of the
         calendar since there are empty columns in between months.
@@ -122,7 +123,11 @@ class NSLS2Calendar():
                     current = current + datetime.timedelta(hours=4)
                     current = current.replace(tzinfo=tz.tzlocal())
                     self.calendar.append((self.sheet[f'{hs}{row:02}'].value, current))
-        #'%s%2.2d' % (hs, row)
+                    #'%s%2.2d' % (hs, row)
+                    
+        ## would be nice to have a configured ics file naming pattern
+        self.icsfile = f'NSLS2-{self.month}-ops.ics'
+
         # import pprint
         # pp = pprint.PrettyPrinter(indent=4)
         # pp.pprint(calendar)
@@ -149,7 +154,8 @@ class NSLS2Calendar():
                        'S/O': 'Studies then Operations',
                        'C':   'Commissioning'}
 
-        ## break the calendar into block, noting the begin and end times of each block
+        ## break the calendar into blocks of events, noting the begin
+        ## and end times of each block
         for block in self.calendar:
             if block[0] != event:
                 e = Event()
@@ -166,9 +172,9 @@ class NSLS2Calendar():
         e.end = block[1] + datetime.timedelta(hours=-4)
         if event != 'O': c.events.add(e)
 
-        with open(f'NSLS2-{self.month}-ops.ics', 'w') as f:
+        with open(self.icsfile, 'w') as f:
             f.writelines(c)
-        print(f'Wrote NSLS2-{self.month}-ops.ics')
+        print(f'\nWrote {self.icsfile}')
 
 
 parser = argparse.ArgumentParser(description='Transmogrify the NSLS2 Excel schedule to ICS files.')
