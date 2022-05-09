@@ -56,7 +56,7 @@ class NSLS2Calendar():
         calendar since there are empty columns in between months.
         There is probably a solution to this problem...
 
-        Note that the blue cells are in row 02
+        Note that the blue cells with months are in row 02
 
         '''
         for i in range(1,200):
@@ -116,7 +116,7 @@ class NSLS2Calendar():
         current = self.firstofmonth
 
         ## ----------------------------------------------------------------------
-        ## now read each half shift of the month, save a tuple with it's op type and a datetime
+        ## now read each half shift of the month, save a tuple with its op type and a datetime
         for row in range(5, 36):
             for hs in halfshifts:
                 if self.sheet[f'{hs}{row:02}'].value is not None:
